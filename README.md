@@ -2,13 +2,16 @@
  4111ProjectPart3, includes server and client
 
 # client
-React app
+React app in client folder
+
+# install
+yarn
 
 # run
 yarn start
 
 # server
-Flask app
+Flask app in server folder
 
 # create venv
 python3 -m venv env
