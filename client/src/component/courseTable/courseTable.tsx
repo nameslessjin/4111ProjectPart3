@@ -3,15 +3,18 @@ import PropTypes from "prop-types";
 
 export interface CourseTableProps {
   courses: { [key: string]: string | number | null }[];
+  handleCoursePress: (event: any) => void
 }
 
 export default class CourseTable extends React.Component<CourseTableProps> {
   static defaultProps = {
     courses: [],
+    handleCoursePress: (event: any) => null
   };
 
   static propTypes = {
     courses: PropTypes.array,
+    handleCoursePress: PropTypes.func
   };
 
   render() {
@@ -25,17 +28,23 @@ export default class CourseTable extends React.Component<CourseTableProps> {
             <thead className="table-dark">
               <tr>
                 {Object.keys(courses[0]).map((k) =>
-                  k != "description" && k != "id" ? (
-                    <th scope="col">{k}</th>
+                  k != "id" ? (
+                    <th scope="col" key={k}>
+                      {k}
+                    </th>
                   ) : null
                 )}
               </tr>
             </thead>
             <tbody>
               {courses.map((c) => (
-                <tr onClick={() => console.log(c)}>
+                <tr onClick={() => this.props.handleCoursePress(c)} key={c.id || c.code}>
                   {Object.entries(c).map((e) =>
-                    e[0] != "description" && e[0] != "id" ? <th scope="row">{e[1]}</th> : null
+                    e[0] != "id" ? (
+                      <th scope="row">
+                        {e[1]}
+                      </th>
+                    ) : null
                   )}
                 </tr>
               ))}
