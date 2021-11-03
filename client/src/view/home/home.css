@@ -1,0 +1,29 @@
+.general-container{
+    /* background-color:aquamarine; */
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    position:absolute;
+    padding:0;
+    margin:0;
+}
+
+.search{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+#submit-search{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
