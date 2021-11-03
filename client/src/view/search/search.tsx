@@ -2,19 +2,25 @@ import React from "react";
 import { RouteChildrenProps } from "react-router-dom";
 import "./search.css";
 import CourseTable from "../../component/courseTable/courseTable";
+import { http } from "../../config";
 
 interface State {
   is_course_only: boolean;
+  courses: { [key: string]: string | number | null }[];
 }
 
 export default class Search extends React.Component<RouteChildrenProps, State> {
   constructor(props: any) {
     super(props);
 
-    this.state = { is_course_only: true };
+    this.state = { is_course_only: false, courses: [] };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleCoursePress = this.handleCoursePress.bind(this);
+  }
+
+  componentDidMount() {
+    this.fetchSearchResult();
   }
 
   handleChange(event: any) {
@@ -23,54 +29,64 @@ export default class Search extends React.Component<RouteChildrenProps, State> {
     }));
   }
 
-  handleCoursePress(event: any) {}
+  componentDidUpdate(prevProps: RouteChildrenProps, prevState: State) {
+    if (this.state.is_course_only != prevState.is_course_only) {
+      const { pathname, search } = this.props.location;
+      const new_search =
+        search.split("courseOnly=")[0] +
+        "courseOnly=" +
+        (search.split("courseOnly=")[1] == "0" ? "1" : "0");
+
+      const url = pathname.substr(1, pathname.length) + new_search;
+
+      this.props.history.replace(url);
+      this.fetchSearchResult();
+    }
+  }
+
+  fetchSearchResult() {
+    const { pathname, search } = this.props.location;
+
+    const new_search =
+      search.split("courseOnly=")[0] +
+      "courseOnly=" +
+      (this.state.is_course_only ? "1" : "0");
+
+    const url = http + pathname.substr(1, pathname.length) + new_search;
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((res) => {
+        res.json().then((re) => {
+          this.setState({ courses: re });
+        });
+      })
+      .catch((err) => console.log(err));
+  }
+
+  handleCoursePress(event: { [key: string]: string | number | null }) {
+
+    if (event.id) {
+      this.props.history.push(`/section/${event.id}`);
+    } else {
+      this.props.history.push(`/course/${event.code}`);
+    }
+  }
 
   render() {
-    const courses = [
-      {
-        id: "0",
-        code: "COMSW4111",
-        name: "INTRODUCTION TO DATABASES",
-        section: "001",
-        time: "Tu Th 1:10PM-2:25PM",
-        location: "301 Pupin Laboratories",
-        description: null,
-        instructor: "Luis Gravano",
-        credits: 3,
-        type: "ELECTIVE",
-      },
-      {
-        id: "1",
-        code: "COMSW4111",
-        name: "INTRODUCTION TO DATABASES",
-        section: "002",
-        time: "F 10:10AM-12:40PM",
-        location: "309 Havemeyer Hall",
-        description: null,
-        instructor: "Donald F Ferguson",
-        credits: 3,
-        type: "ELECTIVE",
-      },
-      {
-        id: "2",
-        code: "COMSW4115",
-        name: "PROGRAMMING LANG & TRANSLATORS",
-        section: "001",
-        time: "M  W 1:10PM-2:25PM",
-        location: "451 Computer Science Building",
-        description: null,
-        instructor: "Baishakhi Ray",
-        credits: 3,
-        type: "ELECTIVE",
-      },
-    ];
-
     return (
       <div className="general-container">
         <div>
           <div className="toggleButtons gap-3">
             <div>
-              <a className="btn btn-secondary" href="/">Back</a>
+              <a className="btn btn-secondary" href="/">
+                Back
+              </a>
             </div>
             <input
               type="checkbox"
@@ -87,7 +103,10 @@ export default class Search extends React.Component<RouteChildrenProps, State> {
               Course Only
             </label>
           </div>
-          <CourseTable courses={courses} />
+          <CourseTable
+            courses={this.state.courses}
+            handleCoursePress={this.handleCoursePress}
+          />
         </div>
       </div>
     );

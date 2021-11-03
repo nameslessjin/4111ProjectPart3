@@ -13,7 +13,9 @@ class App extends Component {
         <NavBar />
         <div>
           <Route exact path="/" component={Home} />
-          <Route path={`/search`} component={Search} />
+          <Route path="/search" component={Search} />
+          <Route path="/course/:code" component={Search} />
+          <Route path="/section/:id" component={Search} />
         </div>
       </BrowserRouter>
     );
