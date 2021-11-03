@@ -70,7 +70,7 @@ export default class Search extends React.Component<RouteChildrenProps, State> {
         <div>
           <div className="toggleButtons gap-3">
             <div>
-              <a className="btn btn-secondary">Back</a>
+              <a className="btn btn-secondary" href="/">Back</a>
             </div>
             <input
               type="checkbox"
