@@ -3,23 +3,38 @@ import PropTypes from "prop-types";
 
 export interface AuthWindowProps {
   is_login: boolean;
+  email: string;
+  password: string;
+  error_message: string;
+  handleChange: (type: string, value: string) => void;
+  handleSubmit: (event: any, is_login: boolean) => void
 }
 
 export default class AuthWindow extends React.Component<AuthWindowProps> {
   static defaultProps = {
     is_login: true,
+    email: "",
+    password: "",
+    error_message: "",
+    handleChange: (type: string, value: string) => null,
+    handleSubmit: (event: any, is_login: boolean) => null
   };
 
   static propTypes = {
     is_login: PropTypes.bool,
+    handleChange: PropTypes.func,
+    email: PropTypes.string,
+    password: PropTypes.string,
+    error_message: PropTypes.string,
+    handleSubmit: PropTypes.func
   };
 
   render() {
-    const { is_login } = this.props;
+    const { is_login, handleChange, email, password, error_message, handleSubmit } = this.props;
 
     return (
       <div className="col-6">
-        <form className="login-form">
+        <form className="login-form" onSubmit={event => handleSubmit(event, is_login)}>
           <h3>{is_login ? "Login" : "Sign Up"}</h3>
           <hr className="bar" />
           <div className="form-group">
@@ -27,7 +42,13 @@ export default class AuthWindow extends React.Component<AuthWindowProps> {
               type="text"
               className="form-control"
               placeholder="Email"
-              value=""
+              value={email}
+              onChange={(event) =>
+                handleChange(
+                  is_login ? "login_email" : "signup_email",
+                  event.target.value
+                )
+              }
             />
           </div>
           <div className="form-group">
@@ -35,7 +56,13 @@ export default class AuthWindow extends React.Component<AuthWindowProps> {
               type="password"
               className="form-control"
               placeholder="Password"
-              value=""
+              value={password}
+              onChange={(event) =>
+                handleChange(
+                  is_login ? "login_password" : "signup_password",
+                  event.target.value
+                )
+              }
             />
           </div>
           {/* {!is_login ? (
@@ -54,6 +81,9 @@ export default class AuthWindow extends React.Component<AuthWindowProps> {
               className="btnSubmit btn btn-secondary login-btn"
               value="Login"
             />
+          </div>
+          <div>
+              <p>{error_message}</p>
           </div>
         </form>
       </div>
