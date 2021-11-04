@@ -4,7 +4,8 @@ import "./App.css";
 import NavBar from "./component/navbar/navbar";
 import Home from "./view/home/home";
 import Search from "./view/search/search"
-
+import Section from './view/section/section'
+import Course from './view/course/course'
 
 class App extends Component {
   render() {
@@ -14,8 +15,8 @@ class App extends Component {
         <div>
           <Route exact path="/" component={Home} />
           <Route path="/search" component={Search} />
-          <Route path="/course/:code" component={Home} />
-          <Route path="/section/:id" component={Home} />
+          <Route path="/course/:code" component={Course} />
+          <Route path="/section/:id" component={Section} />
           <Route path="/user/:id" component={Home} />
         </div>
       </BrowserRouter>

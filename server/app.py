@@ -114,6 +114,101 @@ def search():
 
     return 'bad request!', 400
 
+@app.route('/section/<section_id>', methods=["POST", "GET"])
+def section(section_id):
+
+    query = """
+            SELECT
+                CONCAT(Courses.did, Courses.cnum) AS code,
+                Courses.name,
+                Sections.snum AS section,
+                Sections.time,
+                Sections.location,
+                Instructors.name AS instructor,
+                Courses.credits,
+                Sections.description
+            FROM Sections
+            LEFT JOIN Courses
+            ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
+            LEFT JOIN Course_Associates
+            ON Course_Associates.cnum = Courses.cnum
+            LEFT JOIN Tracks
+            ON Tracks.tid = Course_Associates.tid
+            LEFT JOIN Instructors
+            ON Instructors.iid = Sections.iid
+            WHERE Sections.secid = {section_id}; 
+            """.format(section_id = section_id)
+    cur.execute(query)
+    result = cur.fetchone()
+    section_data = {}
+    code = result[0]
+    name = result[1]
+    section = result[2]
+    time = result[3]
+    location = result[4]
+    instructor = result[5]
+    credits = result[6]
+    id = section_id
+    description = result[7]
+    section_data = { "id": id, "code": code, "name": name, "section": section, "time": time, "location": location, "instructor": instructor, "credits": credits, "description": description}
+    return Response(json.dumps(section_data), mimetype='application/json')
+
+
+@app.route('/course/<course_code>', methods=["POST", "GET"])
+def course(course_code):
+
+    result = {"course":{}, "section":[]}
+
+    query = """
+            SELECT
+                CONCAT(Courses.did, Courses.cnum) AS code,
+                Courses.name,
+                Courses.credits
+            FROM Courses
+            LEFT JOIN Course_Associates
+            ON Course_Associates.cnum = Courses.cnum
+            LEFT JOIN Tracks
+            ON Tracks.tid = Course_Associates.tid
+            WHERE CONCAT(Courses.did, Courses.cnum) = '{course_code}'; 
+            """.format(course_code = course_code)
+
+
+    cur.execute(query)
+    fetch = cur.fetchone()
+    result["course"] = {"code": fetch[0], "name": fetch[1], "credits": fetch[2]}
+
+    query = """
+            SELECT
+                Sections.snum AS section,
+                Sections.time,
+                Sections.location,
+                Instructors.name AS instructor,
+                Sections.secid AS id,
+                Sections.year,
+                Sections.semester
+            FROM Sections
+            LEFT JOIN Courses
+            ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
+            LEFT JOIN Instructors
+            ON Instructors.iid = Sections.iid
+            WHERE CONCAT(Courses.did, Courses.cnum) = '{course_code}'
+            ORDER BY year, semester, section
+            ; 
+            """.format(course_code = course_code)
+
+    cur.execute(query)
+    fetch = cur.fetchall()
+    section_list = []
+    for r in fetch:
+        sec = {"section": r[0], "time": r[1], "location": r[2], "instructor": r[3], "id": r[4], "year": r[5], "semester": r[6]}
+        section_list.append(sec)
+    result["section"] = section_list
+    result["course"]["num_of_sec"] = len(section_list)
+
+    return Response(json.dumps(result), mimetype='application/json')
+
+
+
 
 @app.route('/track_courses', methods=["POST", "GET"])
 def track_courses():

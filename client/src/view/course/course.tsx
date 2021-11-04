@@ -1,52 +1,56 @@
 import React from "react";
 import { RouteChildrenProps } from "react-router-dom";
-import './course.css'
-export default class Course extends React.Component<RouteChildrenProps> {
-    constructor(props: any) {
-        super(props);
-    }
+import "./course.css";
+import { http } from "../../config";
+import CourseSectionDisplay from "../../component/courseSection/courseSectionDisplay";
+import CourseTable from "../../component/courseTable/courseTable";
 
-    render() {
-        return(
-            
-            <div className="container py-4">
-                <div className="card course-card">
-                <div className="card-body">
-                    
-                    <h2 className="course-title">INTRODUCTION TO DATABASES</h2>
-                    <h5 className="card-subtitle mb-2 text-muted">Instructor: Alexandros Biliris</h5>
-                    <hr className="infobar"></hr>
-                
-                
-                    <div className="card course-info-card">
-                        <div className="card-body">
-                            
-                            <ul className="list-group list-group-flush">
-                                <li className="list-group-item">
-                                    <h4>Section Number: 003</h4>
-                                </li>
-                                <li className="list-group-item">
-                                    <h4>Call Number: 12452</h4>
-                                </li>
-                                <li className="list-group-item">
-                                    <h4>Time: F 1:10PM-3:40PM</h4>
-                                </li>
-                                <li className="list-group-item">
-                                    <h4>Location: 402 Chandler</h4>
-                                </li>
-                                <li className="list-group-item">
-                                    <h4>Description</h4>
-                                    <p>Prerequisites: (COMS W3134) or (COMS W3137) or (COMS W3136) and fluency in Java); or the instructor's permission. The fundamentals of database design and application development using databases: entity-relationship modeling, logical design of relational databases, relational data definition and manipulation languages, SQL, XML, query processing, physical database tuning, transaction processing, security. Programming projects are required.</p>
-                                </li>
-                            </ul> 
-                                
-                        </div>
-                    </div>
-                </div>
-                </div>
+interface State {
+  course: { [key: string]: string | number | null };
+  section: { [key: string]: string | number | null }[];
+}
 
-            </div>
-            
-        )
-    }
+export default class Course extends React.Component<RouteChildrenProps, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = { course: {}, section: [] };
+    this.handleSectionPress = this.handleSectionPress.bind(this);
+  }
+
+  componentDidMount() {
+    this.fetchCourseResult();
+  }
+
+  fetchCourseResult() {
+    const { pathname } = this.props.location;
+    const url = http + pathname.substr(1, pathname.length);
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((res: any) => {
+        this.setState({ course: res.course, section: res.section });
+      })
+      .catch((err) => console.log(err));
+  }
+
+  handleSectionPress(event: { [key: string]: string | number | null }) {
+    this.props.history.push(`/section/${event.id}`);
+  }
+
+  render() {
+    const { course, section } = this.state;
+
+    return (
+      <div className="container py-4">
+        <CourseSectionDisplay course_section={course} is_section={false} />
+        <div className="sec-container">
+          <h1>Sections</h1>
+          <CourseTable
+            courses={section}
+            handleCoursePress={this.handleSectionPress}
+          />
+        </div>
+      </div>
+    );
+  }
 }
