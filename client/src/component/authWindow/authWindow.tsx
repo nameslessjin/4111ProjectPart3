@@ -38,7 +38,7 @@ export default class AuthWindow extends React.Component<AuthWindowProps> {
               value=""
             />
           </div>
-          {!is_login ? (
+          {/* {!is_login ? (
             <div className="form-group">
               <input
                 type="password"
@@ -47,7 +47,7 @@ export default class AuthWindow extends React.Component<AuthWindowProps> {
                 value=""
               />
             </div>
-          ) : null}
+          ) : null} */}
           <div className="form-group">
             <input
               type="submit"
