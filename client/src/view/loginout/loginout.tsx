@@ -3,10 +3,26 @@ import { RouteChildrenProps } from "react-router-dom";
 import "./loginout.css";
 import AuthWindow from "../../component/authWindow/authWindow";
 
-export default class Loginout extends React.Component<RouteChildrenProps> {
+
+interface State {
+    email: string,
+    password: string,
+}
+
+export default class Loginout extends React.Component<RouteChildrenProps, State> {
   constructor(props: any) {
     super(props);
+
+    this.state = {email: "", password: ""}
+
+    this.handleChange = this.handleChange.bind(this)
   }
+
+  handleChange(event: any){
+
+    console.log(event.target)
+  }
+
 
   render() {
     return (
