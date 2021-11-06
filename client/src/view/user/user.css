@@ -1,0 +1,25 @@
+.container-profile {
+    overflow-x: hidden;
+    border-radius: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.profile-widget{
+    margin: 20px;
+    border-radius: 10px;
+    background-color: white;
+    height: 500px;
+}
+
+.cover {
+    background-color: blue;
+    border-radius: 10px;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.avatar {
+    border-radius: 10px;
+}
