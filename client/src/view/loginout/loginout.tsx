@@ -69,7 +69,7 @@ export default class Loginout extends React.Component<
         })
         .then((error) => console.log(error));
 
-        
+
     } else {
       if (signup_email.length < 6 || signup_password.length < 6) {
         this.setState({
@@ -78,6 +78,16 @@ export default class Loginout extends React.Component<
         });
         return;
       }
+
+      const credential = {
+          is_login: false,
+          email: signup_email,
+          password: signup_password
+      }
+
+
+      
+
     }
   }
 

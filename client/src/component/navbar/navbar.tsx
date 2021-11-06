@@ -9,8 +9,9 @@ class NavBar extends React.Component {
         <a href="/">
           <h2>Course Finder</h2>
         </a>
-        {/* <Link to="/">Current Tasks</Link>
-        <Link to="/completed">Completed Tasks</Link> */}
+        <a href="/auth">
+            <h2>Login/Signup</h2>
+        </a>
       </div>
     );
   }

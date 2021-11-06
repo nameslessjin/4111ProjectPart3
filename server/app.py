@@ -2,6 +2,7 @@ from flask import Flask, Response, render_template, request
 import psycopg2 
 import json
 from flask_cors import CORS
+import hashlib
 
 app = Flask(__name__)
 CORS(app)
@@ -208,6 +209,24 @@ def course(course_code):
     return Response(json.dumps(result), mimetype='application/json')
 
 
+@app.route('/auth', methods=["POST", "GET"])
+def auth():
+
+    if request.method == "POST":
+        data = request.get_json()
+        email = data['email']
+        password = data['password']
+        is_login = data['is_login']
+        
+
+
+
+    return "true"
+
+def PasswordHash(password):
+    temp = hashlib.md5()
+    temp.update(password.encode("utf-8"))
+    return temp.hexdigest()
 
 
 @app.route('/track_courses', methods=["POST", "GET"])

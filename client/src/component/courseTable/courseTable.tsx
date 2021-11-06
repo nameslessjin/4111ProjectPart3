@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 export interface CourseTableProps {
   courses: { [key: string]: string | number | null }[];
-  isProfile: boolean;
+  isProfile?: boolean;
   handleCoursePress: (event: any) => void
 }
 
@@ -11,12 +11,14 @@ export interface CourseTableProps {
 export default class CourseTable extends React.Component<CourseTableProps> {
   static defaultProps = {
     courses: [],
-    handleCoursePress: (event: any) => null
+    handleCoursePress: (event: any) => null,
+    isProfile: false
   };
 
   static propTypes = {
     courses: PropTypes.array,
-    handleCoursePress: PropTypes.func
+    handleCoursePress: PropTypes.func,
+    isProfile: PropTypes.bool
   };
 
   render() {

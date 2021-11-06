@@ -1,7 +1,7 @@
 import React from "react";
 import { RouteChildrenProps } from "react-router-dom";
 import { http } from "../../config";
-import './user.css'
+// import './user.css'
 import CourseTable from "../../component/courseTable/courseTable";
 
 interface State {

@@ -7,6 +7,7 @@ import Search from "./view/search/search"
 import Section from './view/section/section'
 import Course from './view/course/course'
 import Auth from './view/loginout/loginout'
+import User from './view/user/user'
 
 class App extends Component {
   render() {
@@ -19,7 +20,7 @@ class App extends Component {
           <Route path="/search" component={Search} />
           <Route path="/course/:code" component={Course} />
           <Route path="/section/:id" component={Section} />
-          <Route path="/user/:id" component={Home} />
+          <Route path="/user/:id" component={User} />
         </div>
       </BrowserRouter>
     );

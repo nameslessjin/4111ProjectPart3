@@ -48,6 +48,7 @@ export default class Course extends React.Component<RouteChildrenProps, State> {
           <CourseTable
             courses={section}
             handleCoursePress={this.handleSectionPress}
+            
           />
         </div>
       </div>
