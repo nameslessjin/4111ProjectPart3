@@ -3,8 +3,10 @@ import PropTypes from "prop-types";
 
 export interface CourseTableProps {
   courses: { [key: string]: string | number | null }[];
+  isProfile: boolean;
   handleCoursePress: (event: any) => void
 }
+
 
 export default class CourseTable extends React.Component<CourseTableProps> {
   static defaultProps = {
@@ -34,6 +36,9 @@ export default class CourseTable extends React.Component<CourseTableProps> {
                     </th>
                   ) : null
                 )}
+                <th scope="col">
+                  Modify
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -44,8 +49,11 @@ export default class CourseTable extends React.Component<CourseTableProps> {
                       <th scope="row">
                         {e[1]}
                       </th>
+                      
                     ) : null
                   )}
+                  {this.props.isProfile && <button className="btn btn-primary" style={{backgroundColor: 'blue', marginTop: '10px'}}>Delete</button>}
+                  {!this.props.isProfile && <button className="btn btn-primary">Add</button>}
                 </tr>
               ))}
             </tbody>
