@@ -60,6 +60,7 @@ export default class Search extends React.Component<RouteChildrenProps, State> {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      body: JSON.stringify({ user_id: localStorage.getItem("user_id") }),
     })
       .then((res) => {
         res.json().then((re) => {
@@ -69,13 +70,36 @@ export default class Search extends React.Component<RouteChildrenProps, State> {
       .catch((err) => console.log(err));
   }
 
-  handleCoursePress(event: { [key: string]: string | number | null }) {
-
-    if (event.id) {
-      this.props.history.push(`/section/${event.id}`);
+  handleCoursePress(item: { [key: string]: string | number | null }) {
+    if (item.id) {
+      this.props.history.push(`/section/${item.id}`);
     } else {
-      this.props.history.push(`/course/${event.code}`);
+      this.props.history.push(`/course/${item.code}`);
     }
+  }
+
+  async handleAddDelete(
+    event: any,
+    item: { [key: string]: string | number | null }
+  ) {
+    event.stopPropagation();
+
+    const url = `${http}courseRegistration`;
+
+    await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        user_id: localStorage.getItem("user_id"),
+        section_id: item.id,
+        action: "add",
+      }),
+    }).catch((err) => console.log(err));
+
+    window.location.reload();
   }
 
   render() {
@@ -106,6 +130,8 @@ export default class Search extends React.Component<RouteChildrenProps, State> {
           <CourseTable
             courses={this.state.courses}
             handleCoursePress={this.handleCoursePress}
+            handleAddDelete={this.handleAddDelete}
+            action="add"
           />
         </div>
       </div>

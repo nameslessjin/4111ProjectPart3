@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 export interface AuthWindowProps {
   is_login: boolean;
-  email: string;
+  username: string;
   password: string;
   error_message: string;
   handleChange: (type: string, value: string) => void;
@@ -13,7 +13,7 @@ export interface AuthWindowProps {
 export default class AuthWindow extends React.Component<AuthWindowProps> {
   static defaultProps = {
     is_login: true,
-    email: "",
+    username: "",
     password: "",
     error_message: "",
     handleChange: (type: string, value: string) => null,
@@ -23,14 +23,14 @@ export default class AuthWindow extends React.Component<AuthWindowProps> {
   static propTypes = {
     is_login: PropTypes.bool,
     handleChange: PropTypes.func,
-    email: PropTypes.string,
+    username: PropTypes.string,
     password: PropTypes.string,
     error_message: PropTypes.string,
     handleSubmit: PropTypes.func
   };
 
   render() {
-    const { is_login, handleChange, email, password, error_message, handleSubmit } = this.props;
+    const { is_login, handleChange, username, password, error_message, handleSubmit } = this.props;
 
     return (
       <div className="col-6">
@@ -41,11 +41,11 @@ export default class AuthWindow extends React.Component<AuthWindowProps> {
             <input
               type="text"
               className="form-control"
-              placeholder="Email"
-              value={email}
+              placeholder="username"
+              value={username}
               onChange={(event) =>
                 handleChange(
-                  is_login ? "login_email" : "signup_email",
+                  is_login ? "login_username" : "signup_username",
                   event.target.value
                 )
               }

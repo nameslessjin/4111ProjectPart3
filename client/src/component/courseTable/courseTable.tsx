@@ -3,26 +3,35 @@ import PropTypes from "prop-types";
 
 export interface CourseTableProps {
   courses: { [key: string]: string | number | null }[];
-  isProfile?: boolean;
-  handleCoursePress: (event: any) => void
+  handleCoursePress: (item: { [key: string]: string | number | null }) => void;
+  handleAddDelete: (
+    event: any,
+    item: { [key: string]: string | number | null }
+  ) => void;
+  action?: string;
 }
-
 
 export default class CourseTable extends React.Component<CourseTableProps> {
   static defaultProps = {
     courses: [],
-    handleCoursePress: (event: any) => null,
-    isProfile: false
+    handleCoursePress: (item: { [key: string]: string | number | null }) =>
+      null,
+    handleAddDelete: (
+      event: any,
+      item: { [key: string]: string | number | null }
+    ) => null,
+    action: null,
   };
 
   static propTypes = {
     courses: PropTypes.array,
     handleCoursePress: PropTypes.func,
-    isProfile: PropTypes.bool
+    handleAddDelete: PropTypes.func,
+    action: PropTypes.string || null,
   };
 
   render() {
-    const { courses } = this.props;
+    const { courses, action } = this.props;
     return (
       <div>
         {courses.length == 0 ? (
@@ -38,24 +47,48 @@ export default class CourseTable extends React.Component<CourseTableProps> {
                     </th>
                   ) : null
                 )}
-                <th scope="col">
-                  Modify
-                </th>
+                {"id" in courses[0] &&
+                localStorage.getItem("user_id") &&
+                (action == "add" || action == "delete") ? (
+                  <th scope="col">Add/Delete</th>
+                ) : null}
               </tr>
             </thead>
             <tbody>
               {courses.map((c) => (
-                <tr onClick={() => this.props.handleCoursePress(c)} key={c.id || c.code}>
+                <tr
+                  onClick={(event) => this.props.handleCoursePress(c)}
+                  key={c.id || c.code}
+                >
                   {Object.entries(c).map((e) =>
-                    e[0] != "id" ? (
-                      <th scope="row">
-                        {e[1]}
-                      </th>
-                      
-                    ) : null
+                    e[0] != "id" ? <th scope="row">{e[1]}</th> : null
                   )}
-                  {this.props.isProfile && <button className="btn btn-primary" style={{backgroundColor: 'blue', marginTop: '10px'}}>Delete</button>}
-                  {!this.props.isProfile && <button className="btn btn-primary">Add</button>}
+
+                  {"id" in courses[0] &&
+                  localStorage.getItem("user_id") &&
+                  (action == "add" || action == "delete") ? (
+                    <th>
+                      {action == "delete" ? (
+                        <button
+                          className="btn btn-danger"
+                          onClick={(event) =>
+                            this.props.handleAddDelete(event, c)
+                          }
+                        >
+                          Delete
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-primary"
+                          onClick={(event) =>
+                            this.props.handleAddDelete(event, c)
+                          }
+                        >
+                          Add
+                        </button>
+                      )}
+                    </th>
+                  ) : null}
                 </tr>
               ))}
             </tbody>

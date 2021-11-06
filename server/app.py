@@ -1,3 +1,4 @@
+from typing import Sized
 from flask import Flask, Response, render_template, request
 import psycopg2 
 import json
@@ -45,7 +46,10 @@ def search():
         term = request.args["term"]
         year = term.split("-")[0]
         semester = term.split("-")[1]
-        
+        data = request.get_json()
+        user_id = data['user_id']
+
+
         query = """
                 SELECT
                     CONCAT(Courses.did, Courses.cnum) AS code,
@@ -69,6 +73,41 @@ def search():
                 WHERE Sections.year = {qyear} AND Sections.semester = '{qsemester}' AND Tracks.name = '{qtrack}'; 
                 """.format(qyear = int(year), qsemester = semester.upper(), qtrack = track)
 
+        if (user_id):
+            query = """
+                    SELECT
+                        CONCAT(Courses.did, Courses.cnum) AS code,
+                        Courses.name,
+                        Sections.snum AS section,
+                        Sections.time,
+                        Sections.location,
+                        Instructors.name AS Instructor,
+                        Courses.credits,
+                        Course_Associates.type,
+                        Sections.secid AS id
+                    FROM Sections
+                    LEFT JOIN Courses
+                    ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
+                    LEFT JOIN Course_Associates
+                    ON Course_Associates.cnum = Courses.cnum
+                    LEFT JOIN Tracks
+                    ON Tracks.tid = Course_Associates.tid
+                    LEFT JOIN Instructors
+                    ON Instructors.iid = Sections.iid
+                    WHERE Sections.year = {qyear} AND Sections.semester = '{qsemester}' AND Tracks.name = '{qtrack}'
+                        AND CONCAT(Courses.did, Courses.cnum) NOT IN (
+                            SELECT CONCAT(Courses.did, Courses.cnum) AS code
+                            FROM Enrollments
+                            LEFT JOIN Sections
+                            ON Sections.secid = Enrollments.secid
+                            LEFT JOIN Courses
+                            ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
+                            WHERE Enrollments.sid = '{user_id}'
+                            )
+                    ; 
+                    """.format(qyear = int(year), qsemester = semester.upper(), qtrack = track, user_id=user_id)
+
+
         if (courseOnly == "1"):
             query = """
                     SELECT
@@ -86,6 +125,33 @@ def search():
                     WHERE Sections.year = {qyear} AND Sections.semester = '{qsemester}' AND Tracks.name = '{qtrack}'
                     GROUP BY code, Courses.name, credits, type;
                     """.format(qyear = int(year), qsemester = semester.upper(), qtrack = track)
+
+            if (user_id):
+                query = """
+                        SELECT
+                            CONCAT(Courses.did, Courses.cnum) AS code,
+                            Courses.name,
+                            Courses.credits,
+                            Course_Associates.type
+                        FROM Sections
+                        LEFT JOIN Courses
+                        ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
+                        LEFT JOIN Course_Associates
+                        ON Course_Associates.cnum = Courses.cnum
+                        LEFT JOIN Tracks
+                        ON Tracks.tid = Course_Associates.tid
+                        WHERE Sections.year = {qyear} AND Sections.semester = '{qsemester}' AND Tracks.name = '{qtrack}'
+                            AND CONCAT(Courses.did, Courses.cnum) NOT IN (
+                                SELECT CONCAT(Courses.did, Courses.cnum) AS code
+                                FROM Enrollments
+                                LEFT JOIN Sections
+                                ON Sections.secid = Enrollments.secid
+                                LEFT JOIN Courses
+                                ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
+                                WHERE Enrollments.sid = '{user_id}'
+                                )
+                        GROUP BY code, Courses.name, credits, type;
+                        """.format(qyear = int(year), qsemester = semester.upper(), qtrack = track, user_id = user_id)
 
         cur.execute(query)
         rows = cur.fetchall()
@@ -211,17 +277,55 @@ def course(course_code):
 
 @app.route('/auth', methods=["POST", "GET"])
 def auth():
-
+    
     if request.method == "POST":
+
         data = request.get_json()
-        email = data['email']
+        print(data)
+        print("\n")
+        username = data['username']
         password = data['password']
         is_login = data['is_login']
-        
+        password_hash = PasswordHash(password)
+
+
+        if (not is_login):
+
+            try:
+                query = """
+                    INSERT INTO Students(username, password)
+                    VALUES ('{username}', '{password}');
+                """.format( username=username, password=password_hash)
+                res = cur.execute(query)
+                conn.commit()
+                
+
+            except NameError:
+                print(NameError)
+                user = {"exists": False}
+                return Response(json.dumps(user), mimetype='application/json')
+
+
+        query = """
+            SELECT *
+            FROM Students
+            WHERE Students.username = '{username}' AND students.password = '{password}'
+            LIMIT 1;
+        """.format(username=username, password=password_hash)
+
+        cur.execute(query)
+        fetch = cur.fetchone()
 
 
 
-    return "true"
+        if fetch != None:
+            user = {"id": fetch[0], "username": fetch[1], "exists": True}
+        else:
+            user = {"exists": False}
+
+        return Response(json.dumps(user), mimetype='application/json')
+
+    return True
 
 def PasswordHash(password):
     temp = hashlib.md5()
@@ -229,113 +333,69 @@ def PasswordHash(password):
     return temp.hexdigest()
 
 
-@app.route('/track_courses', methods=["POST", "GET"])
-def track_courses():
-    #return "test"
-    if request.method=="POST":
-        tname = request.form["tracks"]
-        year = request.form["years"]
-        semester = request.form["semesters"]
-        query = """
-                SELECT
-                    CONCAT(Courses.did, Courses.cnum) AS code,
-                    Courses.name,
-                    Sections.snum AS section,
-                    Sections.time,
-                    Sections.location,
-                    Sections.description,
-                    Instructors.name AS Instructor,
-                    Courses.credits,
-                    Course_Associates.type
-                FROM Sections
-                LEFT JOIN Courses
-                ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
-                LEFT JOIN Course_Associates
-                ON Course_Associates.cnum = Courses.cnum
-                LEFT JOIN Tracks
-                ON Tracks.tid = Course_Associates.tid
-                LEFT JOIN Instructors
-                ON Instructors.iid = Sections.iid
-                WHERE Sections.year = {qyear} AND Sections.semester = '{qsemester}' AND Tracks.name = '{qtrack}'; 
-                """.format(qyear = year, qsemester = semester, qtrack = tname)
+@app.route('/user/<user_id>', methods=["POST", "GET"])
+def getUserCourseSection(user_id):
+
+    query = """
+            SELECT
+                Sections.snum AS section,
+                Sections.time,
+                Sections.location,
+                Instructors.name AS instructor,
+                Sections.secid AS id,
+                Sections.year,
+                Sections.semester,
+                CONCAT(Courses.did, Courses.cnum) AS code,
+                Courses.name,
+                Courses.credits
+            FROM Sections
+            LEFT JOIN Courses
+            ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
+            LEFT JOIN Instructors
+            ON Instructors.iid = Sections.iid
+            LEFT JOIN Enrollments
+            ON Enrollments.secid = Sections.secid
+            WHERE Enrollments.sid = {user_id}
+            ORDER BY year, semester, section
+            ; 
+            """.format(user_id=user_id)
+    
+    cur.execute(query)
+    fetch = cur.fetchall()
+    section_list = []
+    for r in fetch:
+        sec = {"id": r[4], "code": r[7], "name": r[8], "year": r[5], "semester": r[6], "section": r[0], "time": r[1], "location": r[2], "instructor": r[3], "credits": r[9]}
+        section_list.append(sec)
+    return Response(json.dumps(section_list), mimetype='application/json')
+
+
+
+@app.route('/courseRegistration', methods=["POST", "GET"])
+def courseRegistration():
+    if (request.method == "POST"):
+        data = request.get_json()
+        user_id = data["user_id"]
+        section_id = data["section_id"]
+        action = data["action"]
+
+        print(data)
+
+        if action == "add":
+            query = """
+                INSERT INTO Enrollments(sid, secid)
+                VALUES ({sid}, {secid})
+            """.format(sid=user_id, secid=section_id)
+        elif action == 'delete':
+            query = """
+                DELETE FROM Enrollments 
+                WHERE sid='{sid}' AND secid='{secid}'
+            """.format(sid=user_id, secid=section_id)
+
         cur.execute(query)
-        rows = cur.fetchall()
-        json_list = []
-        for r in rows:
-            code = r[0]
-            name = r[1]
-            section = r[2]
-            time = r[3]
-            location = r[4]
-            description = r[5]
-            json_list.append({"code": code, "name": name, "section": section, "time": time, "location": location, "description": description})
-            
-        return Response(json.dumps(json_list), mimetype='application/json')
+        conn.commit()
 
-    else:
-        return render_template("track_courses.html")
 
-@app.route('/next_courses', methods=["POST", "GET"])
-def next_courses():
-    if request.method=="POST":
-        sid = request.form["sid"]
-        tname = request.form["tracks"]
-        year = request.form["years"]
-        semester = request.form["semesters"]
-        query = """
-                    SELECT
-                    CONCAT(Courses.did, Courses.cnum) AS code,
-                    Courses.name,
-                    Sections.snum AS section,
-                    Sections.time,
-                    Sections.location,
-                    Sections.description,
-                    Instructors.name AS Instructor,
-                    Courses.credits,
-                    Course_Associates.type
-                FROM Sections
-                LEFT JOIN Courses
-                ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
-                LEFT JOIN Course_Associates
-                ON Course_Associates.cnum = Courses.cnum
-                LEFT JOIN Tracks
-                ON Tracks.tid = Course_Associates.tid
-                LEFT JOIN Instructors
-                ON Instructors.iid = Sections.iid
-                WHERE Sections.year = {qyear} AND Sections.semester = '{qsemester}' AND Tracks.name = '{qtname}'
-                AND CONCAT(Courses.did, Courses.cnum) NOT IN (
-                    SELECT 
-                        CONCAT(Courses.did, Courses.cnum) AS code
-                    FROM Enrollments
-                    LEFT JOIN Sections
-                    ON Sections.secid = Enrollments.secid
-                    LEFT JOIN Courses
-                    ON Courses.did = Sections.did AND Courses.cnum = Sections.cnum
-                    WHERE Enrollments.sid = {qsid})
-                """.format(qyear = year, qsemester = semester, qtname = tname, qsid = sid)
-        cur.execute(query)
-        rows = cur.fetchall()
-        json_list = []
-
-        for r in rows:
-            code = r[0]
-            name = r[1]
-            section = r[2]
-            time = r[3]
-            location = r[4]
-            description = r[5]
-            instructor = r[6]
-            ccredits = r[6]
-            ctype = r[7]
-
-            json_list.append({"code": code, "name": name, "section": section, "time": time, "location": location,
-                            "description": description, "instructor": instructor, "credits": ccredits, "ctype": ctype})
-            
-        return Response(json.dumps(json_list), mimetype='application/json')
-        
-    else:
-        return render_template("next_courses.html")
-
+    return Response("", status=404)
 
 
 @app.route('/find_comments', methods=["POST", "GET"])
