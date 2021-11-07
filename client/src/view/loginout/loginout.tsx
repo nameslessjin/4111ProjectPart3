@@ -39,6 +39,10 @@ export default class Loginout extends React.Component<
       this.state;
     const {} = this.props.location;
     const url = http + "auth";
+
+
+    let regEx = /^[0-9a-zA-Z]+$/;
+
     if (is_login) {
       if (login_username.length < 6 || login_password.length < 6) {
         this.setState({
@@ -46,6 +50,14 @@ export default class Loginout extends React.Component<
             "username or password must be at least 6 characters",
         });
         return;
+      }
+
+      if (!login_username.match(regEx) || !login_password.match(regEx)){
+        this.setState({
+            login_error_message:
+              "username or password cannot contain special characters",
+          });
+          return;
       }
 
       const credential = {
@@ -77,10 +89,18 @@ export default class Loginout extends React.Component<
     } else {
       if (signup_username.length < 6 || signup_password.length < 6) {
         this.setState({
-          login_error_message:
+          signup_error_message:
             "username or password must be at least 6 characters",
         });
         return;
+      }
+
+      if (!login_username.match(regEx) || !login_password.match(regEx)){
+        this.setState({
+            signup_error_message:
+              "username or password cannot contain special characters",
+          });
+          return;
       }
 
       const credential = {
