@@ -95,7 +95,7 @@ export default class Loginout extends React.Component<
         return;
       }
 
-      if (!login_username.match(regEx) || !login_password.match(regEx)){
+      if (!signup_username.match(regEx) || !signup_username.match(regEx)){
         this.setState({
             signup_error_message:
               "username or password cannot contain special characters",
