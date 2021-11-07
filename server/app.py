@@ -4,6 +4,7 @@ import psycopg2
 import json
 from flask_cors import CORS
 import hashlib
+import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -183,7 +184,7 @@ def search():
 
 @app.route('/section/<section_id>', methods=["POST", "GET"])
 def section(section_id):
-
+    print('find section info')
     query = """
             SELECT
                 CONCAT(Courses.did, Courses.cnum) AS code,
@@ -206,7 +207,8 @@ def section(section_id):
             WHERE Sections.secid = {section_id}; 
             """.format(section_id = section_id)
     cur.execute(query)
-    result = cur.fetchone()
+    result = cur.fetchall()[0]
+    print('line 210 result', result)
     section_data = {}
     code = result[0]
     name = result[1]
@@ -446,3 +448,77 @@ def find_comments():
         return Response(json.dumps(json_list), mimetype='application/json')    
     else:
         return render_template("find_comments.html")
+
+@app.route('/findSectionComment/<section_id>', methods=["POST", "GET"])
+def findSectionComment(section_id):
+    
+    if request.method=='POST':
+        query = """
+                SELECT
+                Students.username,
+                Comments.text,
+                Comments.date
+            FROM Comments
+            LEFT JOIN Students
+            ON Students.sid = Comments.sid
+            WHERE Comments.secid = {qsecid}    
+            """.format(qsecid = section_id)
+
+        print('find section comment')
+        cur.execute(query)
+        rows = cur.fetchall()
+        json_list = []
+        
+        for r in rows:
+            username = r[0]
+            text = r[1]
+            date = r[2]
+            json_list.append({"username": username, "text": text, "date": date})
+        
+        print('result', json_list)
+        return Response(json.dumps(json_list), mimetype='application/json')
+
+    else:
+        query = """
+                SELECT
+                Students.username,
+                Comments.text,
+                Comments.date
+            FROM Comments
+            LEFT JOIN Students
+            ON Students.sid = Comments.sid
+            WHERE Comments.secid = {qsecid}    
+            """.format(qsecid = section_id)
+
+        cur.execute(query)
+        rows = cur.fetchall()
+        json_list = []
+
+        for r in rows:
+            username = r[0]
+            text = r[1]
+            date = str(r[2])
+            json_list.append({"username": username, "text": text, "date": date})
+        
+        print(json_list)
+        return Response(json.dumps(json_list), mimetype='application/json')
+
+
+@app.route('/postcomment', methods=['POST', 'GET'])
+def postcomment():
+    print('post comment')
+    data = request.get_json()
+    userid = data["userid"]
+    section_id = data["secid"]
+    comment_content = data["comment_content"]
+    ddate = str(datetime.datetime.now().date())
+    print(type(ddate))
+    query = """
+    INSERT INTO comments(sid, secid, text, date)
+    VALUES({userid}, {section_id}, '{comment_content}', '{qdate}')
+    """.format(userid = userid, section_id = section_id, comment_content = comment_content, qdate = ddate)
+    print(query)
+    json_data = {"userid": userid, "secid": section_id, "comment_content": comment_content}
+    cur.execute(query)
+    conn.commit()
+    return Response(json.dumps(json_data), mimetype='application/json')

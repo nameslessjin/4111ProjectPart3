@@ -37,3 +37,46 @@
     border-radius: 10px;
     border: none;
 }
+
+.container-section-comment{
+    justify-content: center;
+    background-color: #ebebeb;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    overflow-y: auto;
+}
+
+.section-title-container{
+    padding: 15px;
+    font-weight: 1000;
+}
+
+.section-title {
+    padding: 10px;
+}
+
+.card-comment {
+    border: none;
+    border-radius: 4px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+.user-img{
+    width: 100px;
+    border-color: #adc0ff;
+    border-radius: 50px;
+    border-width: 5px;
+}
+
+.user-title {
+    font-weight: 800;
+}
+
+.comment {
+    overflow-y: auto;
+}
