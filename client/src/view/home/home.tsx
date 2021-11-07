@@ -28,7 +28,7 @@ class Home extends React.Component<RouteChildrenProps, State> {
       deparment_selection: [],
       track_selection: [],
       year_selection: ["2021", "2020"],
-      semester_selection: ["Fall", "Spring", "Summer"],
+      semester_selection: ["Fall", "Spring"],
       td_list: [],
     };
 
