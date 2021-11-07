@@ -79,7 +79,7 @@ export default class AuthWindow extends React.Component<AuthWindowProps> {
             <input
               type="submit"
               className="btnSubmit btn btn-secondary login-btn"
-              value="Login"
+              value= {is_login ? "Login" : "Sign Up"}
             />
           </div>
           <div>
