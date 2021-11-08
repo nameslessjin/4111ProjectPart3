@@ -3,6 +3,7 @@
 
 # client
 React app in client folder
+cd client
 
 # install
 yarn
@@ -12,16 +13,18 @@ yarn start
 
 # server
 Flask app in server folder
+cd server
 
-# create venv
-python3 -m venv env
 
 # run venv
 source env/bin/activate
 
 # installing
-python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade pip 
 python3 -m pip install flask
+pip install python-dotenv
+pip install psycopg2
+pip install -U flask-cors
 
 # run
 flask run
