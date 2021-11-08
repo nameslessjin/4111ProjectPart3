@@ -1,15 +1,17 @@
 from typing import Sized
 from flask import Flask, Response, render_template, request
 import psycopg2 
+from dotenv import load_dotenv 
 import json
 from flask_cors import CORS
 import hashlib
 import datetime
-
+import os
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 # connect to the db
-conn = psycopg2.connect(host="35.196.73.133", database="proj1part2", user="hh2916", password="1093")
+conn = psycopg2.connect(host="35.196.73.133", database="proj1part2", user=os.getenv("DB_USERNAME"), password=os.getenv("DB_PASSWORD"))
 
 # cursor
 cur = conn.cursor()
