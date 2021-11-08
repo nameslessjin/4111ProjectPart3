@@ -1,0 +1,22 @@
+.navbar {
+  background-color: #4169e1;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+}
+
+.navbar h2 {
+  display: inline-block;
+  text-align: left;
+  padding: 10px;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* .navbar a {
+  display: inline-block;
+  padding: 10px;
+  color: #fff;
+  text-decoration: none;
+} */

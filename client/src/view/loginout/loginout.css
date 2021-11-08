@@ -1,0 +1,30 @@
+.container .login-container{
+    padding: 5%;
+    margin: 20px
+}
+.login-form{
+    padding: 5%;
+    box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
+    height: 300px;
+    margin-top: 40px;
+}
+
+
+.card .login-card{
+    padding: 5%;
+    margin: auto;
+}
+
+
+
+.bar {
+    background: rgba(0, 0, 0, 0.19)
+}
+
+.card-title .loginout-title {
+    padding: 10px;
+}
+
+.login-btn {
+    width: 100%;
+}
