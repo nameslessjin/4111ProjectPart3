@@ -1,6 +1,9 @@
 # part3
  4111ProjectPart3, includes server and client
 
+# Make sure you have node and npm
+https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+
 # client
 cd client
 
