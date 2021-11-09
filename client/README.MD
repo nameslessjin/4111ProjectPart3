@@ -1,13 +1,13 @@
 # install
-TRY: \n
+TRY: \
 yarn
 
-OR: \n
+OR: \
 npm install
 
 # run
-TRY: \n
+TRY: \
 yarn start
 
-OR: \n
+OR: \
 npm start
