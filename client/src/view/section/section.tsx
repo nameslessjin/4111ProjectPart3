@@ -65,6 +65,7 @@ export default class Section extends React.Component<
     const secid = pathname.split("/section/");
     if(!localStorage.getItem("user_id")) {
       this.props.history.push('/auth');
+      return
     }
     const data = {
       comment_content: this.state.comment,
