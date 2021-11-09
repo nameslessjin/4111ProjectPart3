@@ -1,3 +1,3 @@
-export const http = 'http://127.0.0.1:5000/';
+export const http = 'https://cmos4111-project1-server.herokuapp.com/';
 
 

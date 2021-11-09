@@ -460,3 +460,6 @@ def postcomment():
     json_data = {"username": fetch[0], "text": comment_content, "date": str(ddate)}
 
     return Response(json.dumps(json_data), mimetype='application/json')
+
+if __name__ == '__main__':
+    app.run(host="localhost", port=8111)
