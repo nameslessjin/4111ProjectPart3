@@ -1,3 +1,3 @@
-export const http = 'http://127.0.0.1:8111/';
+export const http = 'http://localhost:8111/';
 
 
