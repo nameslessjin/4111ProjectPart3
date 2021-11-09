@@ -19,7 +19,7 @@ source env/bin/activate
 
 # installing
 TRY: \
-python3 -m pip install -r requirements.txt \
+python3 -m pip install -r requirements.txt
 
 OR: \
 python3 -m pip install --upgrade pip \
